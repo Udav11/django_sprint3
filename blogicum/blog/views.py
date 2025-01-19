@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from blog.models import Post, Category
 from django.db.models import Q
@@ -16,7 +16,15 @@ def index(request):
 
 
 def post_detail(request, post_id):
-    return render(request, 'blog/detail.html')
+    post_list = get_object_or_404(
+        Post.objects.filter(
+            
+        ), pk=post_id
+    )
+    context = {
+        'post_list': post_list
+    }
+    return render(request, 'blog/detail.html', context)
 
 
 def category_posts(request, category_slug):

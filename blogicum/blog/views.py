@@ -1,23 +1,40 @@
 from django.shortcuts import render
 from django.http import Http404
-
-posts = []
-
-post_for_id = {post['id']: post for post in posts}
+from blog.models import Post, Category
+from django.db.models import Q
 
 
 def index(request):
-    return render(request, 'blog/index.html', {'post': reversed(posts)})
+    post_list = Post.objects.select_related('category').filter(
+        is_published = True,
+        category__is_published = True
+    )[0:5]
+    context = {
+        'post_list': post_list,
+    }
+    return render(request, 'blog/index.html', context)
 
 
 def post_detail(request, post_id):
-    try:
-        context = {'post': post_for_id[post_id]}
-    except Exception:
-        raise Http404()
-    return render(request, 'blog/detail.html', context)
+    return render(request, 'blog/detail.html')
 
 
 def category_posts(request, category_slug):
-    return render(request, 'blog/category.html',
-                  {'category_slug': category_slug})
+    post_list = Post.objects.select_related('category').filter(
+        is_published = True,
+        category__slug = category_slug
+    )
+    category = Category.objects.values().filter(
+        slug=category_slug
+    )
+
+    if Category.objects.values('is_published').filter(
+        slug=category_slug)[0]['is_published'] is False:
+        raise Http404('Page not found')
+    
+    context = {
+        'category': category[0],
+        'post_list': post_list
+    }
+    return render(request, 'blog/category.html', context)
+

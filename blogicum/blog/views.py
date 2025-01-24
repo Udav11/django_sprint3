@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from blog.models import Post, Category
-from django.db.models import Q
 from django.db.models.functions import Now
 
 

@@ -18,7 +18,10 @@ def post_detail(request, post_id):
     post_list = get_object_or_404(
         Post.objects.select_related(
             'author', 'category', 'location',
-        ).filter(pub_date__lt=Now(),), id=post_id
+        ).filter(pub_date__lt=Now(),
+                 is_published=True,
+                 category__is_published=True
+                 ), id=post_id
     )
     return render(request, 'blog/detail.html', {'post': post_list})
 
@@ -26,7 +29,8 @@ def post_detail(request, post_id):
 def category_posts(request, category_slug):
     post_list = Post.objects.select_related('category').filter(
         is_published=True,
-        category__slug=category_slug
+        category__slug=category_slug,
+        pub_date__lt=Now()
     )
     category = Category.objects.values().filter(
         slug=category_slug

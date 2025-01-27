@@ -1,10 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from django.conf import settings
 from blog.models import Post, Category
 
 Now = timezone.now()
-MAX_POSTS = settings.POST_LIMIT
+MAX_POSTS = 5
 
 
 def get_objects():

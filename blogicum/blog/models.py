@@ -1,10 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.conf import settings
 
 User = get_user_model()
-MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
-NAME_MAX_LENGTH = settings.NAME_MAX_LENGTH
+MAX_LENGTH = 256
+MAX_LENGTH = 15
 
 
 class PublishedModel(models.Model):
@@ -18,7 +17,7 @@ class PublishedModel(models.Model):
     class Meta:
         abstract = True
         ordering = ('created_at', )
-        default_related_name = 'published_model'
+        default_related_name = '%(class)ss'
 
 
 class Category(PublishedModel):

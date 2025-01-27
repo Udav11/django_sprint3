@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User = get_user_model()
+MAX_LENGTH = settings.CHAR_FIELD_MAX_LENGTH
+NAME_MAX_LENGTH = settings.NAME_MAX_LENGTH
 
 
 class PublishedModel(models.Model):
@@ -15,38 +18,41 @@ class PublishedModel(models.Model):
     class Meta:
         abstract = True
         ordering = ('created_at', )
+        default_related_name = 'published_model'
 
 
 class Category(PublishedModel):
-    title = models.CharField(max_length=256, verbose_name='Заголовок')
+    title = models.CharField(max_length=MAX_LENGTH, verbose_name='Заголовок')
     description = models.TextField(verbose_name='Описание')
     slug = models.SlugField(
         unique=True,
         verbose_name='Идентификатор',
-        help_text='Идентификатор страницы для URL; разрешены символы латиницы,'
-        ' цифры, дефис и подчёркивание.')
+        help_text=('Идентификатор страницы для URL; разрешены символы латиницы'
+                   ' ,цифры, дефис и подчёркивание.')
+    )
 
-    class Meta:
+    class Meta(PublishedModel.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title
+        return self.title[:NAME_MAX_LENGTH]
 
 
 class Location(PublishedModel):
-    name = models.CharField(max_length=256, verbose_name='Название места')
+    name = models.CharField(max_length=MAX_LENGTH,
+                            verbose_name='Название места')
 
-    class Meta:
+    class Meta(PublishedModel.Meta):
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[:NAME_MAX_LENGTH]
 
 
 class Post(PublishedModel):
-    title = models.CharField(max_length=256, verbose_name='Заголовок')
+    title = models.CharField(max_length=MAX_LENGTH, verbose_name='Заголовок')
     text = models.TextField(verbose_name='Текст')
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
@@ -66,10 +72,10 @@ class Post(PublishedModel):
         null=True,
         verbose_name='Категория')
 
-    class Meta:
+    class Meta(PublishedModel.Meta):
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
         ordering = ('-pub_date', )
 
     def __str__(self):
-        return self.title
+        return self.title[:NAME_MAX_LENGTH]
